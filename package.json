@@ -1,0 +1,56 @@
+{
+  "name": "dsh-session-handoff",
+  "version": "0.5.3",
+  "description": "Threshold-triggered session handoff for DSH: summarize the current session and open a brand-new one, leaving the old log intact as a searchable archive.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./summary-engine": "./lib/summary-engine.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "client.js",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0",
+    "dsh": ">=0.2.1-rc.2"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "*",
+    "@deepseek-ai/dsh-llm": "*",
+    "@deepseek-ai/dsh-tools": "*"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-chat"
+      ]
+    }
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "context",
+    "handoff",
+    "session-fork",
+    "compaction"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/better-than-coca/dsh-session-handoff.git"
+  },
+  "homepage": "https://github.com/better-than-coca/dsh-session-handoff#readme",
+  "scripts": {
+    "test": "node test/run.mjs"
+  },
+  "license": "MIT"
+}

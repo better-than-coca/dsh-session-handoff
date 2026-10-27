@@ -1,0 +1,31 @@
+# The handoff needs a fact-dense summarizer reachable from the ROOT context.
+# Compaction backends live inside each agent preset's isolated group, where
+# root-level code cannot reach them, so this bundle mounts its own instance.
+#
+# This entry is a summarizer host, not a compactor: `auto: false` means it never
+# joins automatic pressure handling, and the handoff path calls the engine's
+# summarize() directly WITHOUT committing anything back into the session. The
+# outgoing session is therefore never mutated.
+#
+# It is ADDED, never a replacement: no host entry is disabled, so a failure here
+# degrades the handoff feature only.
+- insert:
+    - id: handoff-compaction-root
+      name: 'dsh-session-handoff/summary-engine'
+      config:
+        auto: false
+        thresholdRatio: 0.8
+        retainRatio: 0.16
+        maxTokens: 8192
+
+    - id: session-handoff
+      name: dsh-session-handoff
+      disabled: true
+      config:
+        mode: ask
+        dryRun: true
+        askRatio: 0.55
+        autoRatio: 0.75
+        minRatio: 0.3
+        maxHandoffsPerSession: 1
+        includeHistoryTool: true
