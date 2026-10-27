@@ -114,7 +114,7 @@
 
 npm 上的名字是 `@better-than-coca/dsh-session-handoff`。装进桌面端 profile 分两步：
 
-1. `profiles/desktop/package.json` 的 `dependencies` 加 `"@better-than-coca/dsh-session-handoff": "^0.5.3"`，`dsh.profile.bundles` 数组末尾加同名条目。
+1. `profiles/desktop/package.json` 的 `dependencies` 加 `"@better-than-coca/dsh-session-handoff": "^0.5.4"`，`dsh.profile.bundles` 数组末尾加同名条目。
 2. 在 profile 目录跑 `pnpm install`，重启桌面端。
 
 **别用 `link:` 指向本地源码目录。** pnpm 会把这种依赖建成 junction，Node 按真实路径解析，从源码目录里找不到 profile 里的 `@deepseek-ai/*` 宿主包 —— 表现是插件显示「已启用」，但助手消息下没有按钮、左侧栏也没有设置页。安装目录必须是真实副本，不能是符号链接。
@@ -147,6 +147,7 @@ node test\run.mjs
 
 ## 版本
 
+- `0.5.4`（2026-10-28）：只改文档。安装说明换成 npm 上的 scoped 包，并写明为什么不能 `link:` 到源码目录——pnpm 会把这种依赖建成 junction，Node 按真实路径解析，找不到 profile 里的 `@deepseek-ai/*` 宿主包，表现是插件显示「已启用」但按钮和设置页都消失。`install.ps1` 的目标目录同步改到 `node_modules\@better-than-coca\dsh-session-handoff`。
 - `0.5.3`（2026-10-28）：交接会话挂进工作区。0.5.2 只传 `cwd` 创建，宿主不会把它挂到工作区，结果是会话能跑、界面也能打开，但侧栏里找不到。现在先按目录 `resolveByPath` 拿 `workspaceId` 再建，建完再补一次 `attachSession`；另加 `POST /attach` 用于捞回已经存在的孤儿会话。
 - `0.5.2`（2026-10-28）：把「开新会话」从浏览器那半搬到宿主那半，直接调 `sessionController.create` + `.prompt`；浏览器只负责导航。结果写进 `/status.followUp`，按钮按结果说话。0.5.0 的浏览器方案在你这套环境里没成功（点了按钮只落盘摘要、没有新会话）。
 - `0.5.1`（2026-10-28）：区分「会话休眠」和「没有活着的会话」。重启后没跑过一轮的会话点击时返回 `session-dormant`，按钮提示先发一句话，不再给含糊的 `no live session`。
