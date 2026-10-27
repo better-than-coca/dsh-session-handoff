@@ -11,7 +11,7 @@
 # degrades the handoff feature only.
 - insert:
     - id: handoff-compaction-root
-      name: 'dsh-session-handoff/summary-engine'
+      name: '@better-than-coca/dsh-session-handoff/summary-engine'
       config:
         auto: false
         thresholdRatio: 0.8
@@ -19,7 +19,7 @@
         maxTokens: 8192
 
     - id: session-handoff
-      name: dsh-session-handoff
+      name: '@better-than-coca/dsh-session-handoff'
       disabled: true
       config:
         mode: ask

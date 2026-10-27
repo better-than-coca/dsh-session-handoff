@@ -14,7 +14,7 @@
  *   POST /api/dsh-session-handoff/handoff { sessionId }  -> { ok, running|queued }
  */
 window.__ModuleLoader__.load({
-  id: 'dsh-session-handoff',
+  id: '@better-than-coca/dsh-session-handoff',
   factory(require) {
     const React = require('react')
     const h = React.createElement
