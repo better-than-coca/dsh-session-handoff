@@ -112,16 +112,14 @@
 
 ## 安装 / 回滚
 
-安装（复制进 profile）：
+npm 上的名字是 `@better-than-coca/dsh-session-handoff`。装进桌面端 profile 分两步：
 
-```powershell
-$dst = "$env:USERPROFILE\.dsh\profiles\desktop\node_modules\dsh-session-handoff"
-New-Item -ItemType Directory $dst -Force | Out-Null
-Copy-Item E:\dsh\dsh-session-handoff\lib $dst -Recurse -Force
-Copy-Item E:\dsh\dsh-session-handoff\client.js $dst -Force
-Copy-Item E:\dsh\dsh-session-handoff\package.json $dst -Force
-Copy-Item E:\dsh\dsh-session-handoff\cordis.patch.yml $dst -Force
-```
+1. `profiles/desktop/package.json` 的 `dependencies` 加 `"@better-than-coca/dsh-session-handoff": "^0.5.3"`，`dsh.profile.bundles` 数组末尾加同名条目。
+2. 在 profile 目录跑 `pnpm install`，重启桌面端。
+
+**别用 `link:` 指向本地源码目录。** pnpm 会把这种依赖建成 junction，Node 按真实路径解析，从源码目录里找不到 profile 里的 `@deepseek-ai/*` 宿主包 —— 表现是插件显示「已启用」，但助手消息下没有按钮、左侧栏也没有设置页。安装目录必须是真实副本，不能是符号链接。
+
+要在本机改源码调试，用 `install.ps1`：它把 `lib`、`client.js`、`package.json`、`cordis.patch.yml` 复制（不是链接）到 `node_modules\@better-than-coca\dsh-session-handoff`。
 
 启用：`profiles/desktop/cordis.patch.yml` 里 `id: session-handoff` 的 `disabled` 改 `false`。
 
@@ -132,7 +130,7 @@ cd E:\dsh\dsh-session-handoff
 node test\run.mjs
 ```
 
-回滚：`disabled` 改回 `true`，重启桌面端。设置文件留在原地不影响。
+回滚：`cordis.patch.yml` 里 `disabled` 改回 `true`，或从 `dependencies` 删掉后重跑 `pnpm install`。设置文件留在原地不影响。
 
 ## 已知限制
 
