@@ -1,0 +1,48 @@
+name: Publish Package
+
+# Publishes to npm through OIDC trusted publishing — no npm token, no OTP, no browser.
+# Requires a "Trusted Publisher" entry on npmjs.com for this repository:
+#   owner better-than-coca / repository dsh-session-handoff / workflow publish.yml
+# and that entry must have direct publishing ("npm publish") enabled.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # required for OIDC
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false   # never cache in release builds
+
+      # No install step on purpose: the plugin has no runtime dependencies
+      # (host packages are injected by DSH) and the repository carries no lockfile.
+      - name: Show toolchain
+        run: node -v && npm -v
+
+      - name: Tag must match package.json version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          expected="v$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_REF_NAME" != "$expected" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match package.json ($expected)"
+            exit 1
+          fi
+          echo "tag $GITHUB_REF_NAME matches package.json"
+
+      - run: npm test
+
+      - run: npm publish
+
