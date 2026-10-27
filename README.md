@@ -132,6 +132,17 @@ node test\run.mjs
 
 回滚：`cordis.patch.yml` 里 `disabled` 改回 `true`，或从 `dependencies` 删掉后重跑 `pnpm install`。设置文件留在原地不影响。
 
+## 发版
+
+推 tag 就发，CI 自己跑测试并发布，不需要 npm token、不需要 2FA：
+
+```powershell
+npm version patch
+git push origin HEAD --follow-tags
+```
+
+workflow 先校验 tag 名等于 `package.json` 的版本，再跑 `npm test`，最后 `npm publish`。发布走 npmjs.com 上该仓库的 Trusted Publisher（`publish.yml`），配置首次建立后必须在 2 天内成功发一次才算生效。
+
 ## 已知限制
 
 - 交接要在这个会话**当前进程里活着**（跑过至少一轮）。宿主的上下文只存在于 Agent 里，重启后一次都没跑过的会话读不到，按钮会直接提示「先发一句话」。
@@ -147,6 +158,7 @@ node test\run.mjs
 
 ## 版本
 
+- `0.5.6`（2026-10-28）：加 GitHub Actions 发布流水线（OIDC trusted publishing；推 `v*` tag 自动 `npm test` + `npm publish`，不再需要 2FA 或 npm token），补 `.gitattributes`。插件代码与安装方式不变。
 - `0.5.5`（2026-10-28）：内容与 0.5.4 相同（0.5.4 没在 registry 落库）。`lib`、`client.js` 与 0.5.3 逐字节一致，只有 README 和版本号变了。
 - `0.5.4`（2026-10-28）：只改文档。安装说明换成 npm 上的 scoped 包，并写明为什么不能 `link:` 到源码目录——pnpm 会把这种依赖建成 junction，Node 按真实路径解析，找不到 profile 里的 `@deepseek-ai/*` 宿主包，表现是插件显示「已启用」但按钮和设置页都消失。`install.ps1` 的目标目录同步改到 `node_modules\@better-than-coca\dsh-session-handoff`。
 - `0.5.3`（2026-10-28）：交接会话挂进工作区。0.5.2 只传 `cwd` 创建，宿主不会把它挂到工作区，结果是会话能跑、界面也能打开，但侧栏里找不到。现在先按目录 `resolveByPath` 拿 `workspaceId` 再建，建完再补一次 `attachSession`；另加 `POST /attach` 用于捞回已经存在的孤儿会话。
