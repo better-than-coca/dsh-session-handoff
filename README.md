@@ -114,7 +114,7 @@
 
 npm 上的名字是 `@better-than-coca/dsh-session-handoff`。装进桌面端 profile 分两步：
 
-1. `profiles/desktop/package.json` 的 `dependencies` 加 `"@better-than-coca/dsh-session-handoff": "^0.5.5"`，`dsh.profile.bundles` 数组末尾加同名条目。
+1. `profiles/desktop/package.json` 的 `dependencies` 加 `"@better-than-coca/dsh-session-handoff": "^0.5.7"`，`dsh.profile.bundles` 数组末尾加同名条目。
 2. 在 profile 目录跑 `pnpm install`，重启桌面端。
 
 **别用 `link:` 指向本地源码目录。** pnpm 会把这种依赖建成 junction，Node 按真实路径解析，从源码目录里找不到 profile 里的 `@deepseek-ai/*` 宿主包 —— 表现是插件显示「已启用」，但助手消息下没有按钮、左侧栏也没有设置页。安装目录必须是真实副本，不能是符号链接。
@@ -123,7 +123,7 @@ npm 上的名字是 `@better-than-coca/dsh-session-handoff`。装进桌面端 pr
 
 启用：`profiles/desktop/cordis.patch.yml` 里 `id: session-handoff` 的 `disabled` 改 `false`。
 
-测试（5 个套件、216 条断言；自动建沙箱与宿主包 stub）：
+测试（5 个套件、219 条断言；自动建沙箱与宿主包 stub）：
 
 ```powershell
 cd E:\dsh\dsh-session-handoff
@@ -158,6 +158,7 @@ workflow 先校验 tag 名等于 `package.json` 的版本，再跑 `npm test`，
 
 ## 版本
 
+- `0.5.7`（2026-10-28）：状态接口与真正的交接判定对齐。`performHandoff` 一直在压力低于 `minRatio`（默认 0.30）时拒绝，但 `/status`、`session_handoff(action:"status")` 不检查它，于是压力不到线时仍报「可交接」，点按钮/调工具也回 `queued`，等到这一轮结束才被静默拒绝——文件不写、日志里只有一行 warn，看起来就是「什么都没发生」。现在 `refusalReasons` 收下压力读数一起判断：`/status` 的 `eligible`/`reason` 会直接写「pressure 26.0% is below minRatio 0.3」，工具也返回 `REFUSED` 而不是 `QUEUED`。排队机制本身没改。
 - `0.5.6`（2026-10-28）：加 GitHub Actions 发布流水线（OIDC trusted publishing；推 `v*` tag 自动 `npm test` + `npm publish`，不再需要 2FA 或 npm token），补 `.gitattributes`。插件代码与安装方式不变。
 - `0.5.5`（2026-10-28）：内容与 0.5.4 相同（0.5.4 没在 registry 落库）。`lib`、`client.js` 与 0.5.3 逐字节一致，只有 README 和版本号变了。
 - `0.5.4`（2026-10-28）：只改文档。安装说明换成 npm 上的 scoped 包，并写明为什么不能 `link:` 到源码目录——pnpm 会把这种依赖建成 junction，Node 按真实路径解析，找不到 profile 里的 `@deepseek-ai/*` 宿主包，表现是插件显示「已启用」但按钮和设置页都消失。`install.ps1` 的目标目录同步改到 `node_modules\@better-than-coca\dsh-session-handoff`。

@@ -164,6 +164,16 @@ check('status: reports pressure and eligibility', status.includes('62.0%') && st
 check('status: proves the surface is readable before handoff', status.includes('surface: 3 messages ready'), status);
 check('status: reports no waiting checkpoint yet', status.includes('pending checkpoint: none'), status);
 
+// --- the same floor performHandoff enforces, reported before the fact --------
+{
+    const lowAgent = { session: Object.assign({}, parentSession, { id: 'session-low' }) };
+    const lowStatus = await handoffTool.execute({ action: 'status' }, { agent: lowAgent });
+    check('status: below minRatio is not eligible', lowStatus.includes('eligible: no') && lowStatus.includes('minRatio'), lowStatus);
+    const lowAsked = await handoffTool.execute({ action: 'handoff' }, { agent: lowAgent });
+    check('handoff: below minRatio is refused, not queued', lowAsked.startsWith('REFUSED') && lowAsked.includes('minRatio'), lowAsked);
+    check('handoff: a refusal summarizes nothing', summarizeCalls.length === 0, JSON.stringify(summarizeCalls.length));
+}
+
 // --- the button's follow-up payload -----------------------------------------
 {
     const route = routes.find((item) => item.path.endsWith('/status'));
