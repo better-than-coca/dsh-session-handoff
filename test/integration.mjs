@@ -7,7 +7,7 @@
  * parent archive stays readable through handoff_history.
  */
 
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import zlib from 'node:zlib';
@@ -64,6 +64,9 @@ const log = [];
 const createdSessions = [];
 const prompts = [];
 const attached = [];
+// Workspaces the registry double registered on demand, keyed by path.
+const registered = new Map();
+const createdWorkspaces = [];
 // Mirrors the real registry: register returns the unregister disposer.
 const toolsService = {
     register(tool) {
@@ -116,14 +119,24 @@ function hostContext(overrides = {}) {
             if (name === 'tokenMeter') return { measure: () => ({ nodes: [{ seq: 1, tokens: 300000 }, { seq: 2, tokens: 320000 }] }) };
             // Present so the suite can prove the plugin never reaches for it.
             if (name === 'workspaceRegistry') {
-                const workspace = (id) => ({
+                const workspace = (id, path = 'E:\\dsh') => ({
                     id,
-                    path: 'E:\\dsh',
+                    path,
+                    get title() { return path.split('\\').pop(); },
                     attachSession: async (sessionId) => { attached.push(sessionId); }
                 });
                 return {
-                    resolveByPath: async (path) => (path === 'E:\\dsh' ? workspace('ws-1') : undefined),
-                    get: (id) => workspace(id)
+                    async resolveByPath(path) {
+                        if (path === 'E:\\dsh') return workspace('ws-1');
+                        return registered.has(path) ? workspace(registered.get(path), path) : undefined;
+                    },
+                    async create(path) {
+                        createdWorkspaces.push(path);
+                        if (!registered.has(path)) registered.set(path, 'ws-' + (registered.size + 2));
+                        return workspace(registered.get(path), path);
+                    },
+                    get: (id) => workspace(id),
+                    list: () => [workspace('ws-1'), ...[...registered].map(([path, id]) => workspace(id, path))]
                 };
             }
             if (name === 'sessionController') {
@@ -374,6 +387,84 @@ function settingsReq(method, payload) {
     check('follow-up: the status route reports the opened session',
         answered.body.followUp?.code === 'opened' && answered.body.followUp?.sessionId === 'session-child',
         JSON.stringify(answered.body.followUp));
+}
+
+// --- continuing in another directory ----------------------------------------
+{
+    handlers.clear();
+    tools.length = 0;
+    routes.length = 0;
+    createdSessions.length = 0;
+    prompts.length = 0;
+    attached.length = 0;
+    summarizeCalls.length = 0;
+    apply(hostContext(), {
+        mode: 'ask', dryRun: false, askRatio: 0.5, autoRatio: 0.8, minRatio: 0.3, autoOpenSession: true
+    });
+    const targetPreStep = handlers.get('agent/pre-step')[0];
+    const targetIdle = handlers.get('agent/status')[0];
+    const targetTool = tools.find((tool) => tool.name === 'session_handoff');
+    await targetPreStep({ agent }, async () => ({ kind: 'enter', messages: [{ role: 'user', content: [] }] }));
+
+    const listed = await targetTool.execute({ action: 'workspaces' }, { agent });
+    check('target: lists the workspaces and marks this one',
+        listed.includes('E:\\dsh') && listed.includes('(this conversation)'), listed);
+
+    const relative = await targetTool.execute({ action: 'handoff', targetDir: 'new-project' }, { agent });
+    check('target: a relative path is refused before summarizing',
+        relative.startsWith('REFUSED') && relative.includes('fully qualified'), relative);
+    check('target: that refusal summarizes nothing', summarizeCalls.length === 0, String(summarizeCalls.length));
+
+    const fresh = join(home, 'fresh-workspace');
+    const noCreate = await targetTool.execute({ action: 'handoff', targetDir: fresh }, { agent });
+    check('target: a missing directory is refused unless creation is requested',
+        noCreate.startsWith('REFUSED') && noCreate.includes('no directory at'), noCreate);
+
+    const accepted = await targetTool.execute({ action: 'handoff', targetDir: fresh, createTargetDir: true }, { agent });
+    check('target: creating the directory is accepted and queued', accepted.startsWith('QUEUED'), accepted);
+    check('target: the queue names the destination', accepted.includes(fresh), accepted);
+
+    const queuedStatus = await targetTool.execute({ action: 'status' }, { agent });
+    check('target: status shows the queued destination',
+        queuedStatus.includes('queued target: ' + fresh), queuedStatus);
+
+    targetIdle({ agent, status: 'idle' });
+    await new Promise((resolve) => setTimeout(resolve, 400));
+
+    check('target: the new session opens outside the old workspace',
+        createdSessions.length === 1 && createdSessions[0]?.workspaceId === 'ws-2', JSON.stringify(createdSessions));
+    check('target: the destination was registered as a workspace',
+        createdWorkspaces.includes(fresh), JSON.stringify(createdWorkspaces));
+    check('target: the child is attached to it', attached.includes('session-child'), JSON.stringify(attached));
+    check('target: the child was prompted exactly once',
+        prompts.length === 1 && prompts[0]?.sessionId === 'session-child', JSON.stringify(prompts.map((item) => item.sessionId)));
+
+    const opened = await invoke(routes.find((route) => route.path.endsWith('/status')), 'GET');
+    check('target: the outcome reports where it opened',
+        opened.body.followUp?.code === 'opened' && opened.body.followUp?.cwd === fresh,
+        JSON.stringify(opened.body.followUp));
+
+    const consumed = await targetTool.execute({ action: 'status' }, { agent });
+    check('target: the handoff consumes the choice, so it cannot leak into the next one',
+        !consumed.includes('queued target:'), consumed);
+}
+
+// --- a dry run reports a new destination, it never creates it ----------------
+{
+    handlers.clear();
+    tools.length = 0;
+    routes.length = 0;
+    summarizeCalls.length = 0;
+    apply(hostContext(), {
+        mode: 'ask', dryRun: true, askRatio: 0.5, autoRatio: 0.8, minRatio: 0.3, autoOpenSession: true
+    });
+    const dryTool = tools.find((tool) => tool.name === 'session_handoff');
+    const absent = join(home, 'dry-workspace');
+    const reported = await dryTool.execute({ action: 'handoff', targetDir: absent, createTargetDir: true }, { agent });
+    check('target: a dry run reports the directory it would create',
+        reported.startsWith('DRY-RUN') && reported.includes('would have created ' + absent), reported);
+    check('target: a dry run creates nothing', !existsSync(absent), absent);
+    check('target: a dry run summarizes nothing', summarizeCalls.length === 0, String(summarizeCalls.length));
 }
 
 rmSync(home, { recursive: true, force: true });

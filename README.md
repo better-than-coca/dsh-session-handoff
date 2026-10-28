@@ -72,9 +72,10 @@
 
 ## 工具
 
-- `session_handoff(action:"status")`：压力、能否交接、上次交接结果。
-- `session_handoff(action:"handoff")`：请求交接，本轮结束后生成摘要并挂起。
-- `session_handoff(action:"cancel")`：丢弃还没被使用的摘要。
+- `session_handoff(action:"status")`：压力、能否交接、上次交接结果、有没有排着的目标目录。
+- `session_handoff(action:"workspaces")`：列出已登记的工作区，标出当前会话所在的那个。
+- `session_handoff(action:"handoff", targetDir?, createTargetDir?)`：请求交接，本轮结束后生成摘要并挂起。`targetDir` 是绝对路径，指定新会话开在哪个目录；目录不存在时加 `createTargetDir:true` 才会创建。
+- `session_handoff(action:"cancel")`：丢弃还没被使用的摘要，同时清掉这次选的目标目录。
 - `handoff_history(query | seq | source, before, after, limit)`：`source:"self"` 读本会话，`source:"parent"` 读旧会话日志。
 
 ## 新旧会话各是什么
@@ -86,6 +87,18 @@
 | 之后能否再交接 | 看 `maxHandoffsPerSession` | 能（它不是 fork 出来的） |
 
 需要旧细节时，在新会话里调 `handoff_history({ query: "关键词", source: "parent" })`，它直接读旧会话的日志文件。
+
+## 交接到另一个工作区
+
+默认新会话开在当前会话的工作目录里。要把摘要落到别处，交接时给一个绝对路径：
+
+- 目录已存在但还不是工作区 → 自动登记成工作区，新会话挂在它下面，侧栏能直接看到。
+- 目录不存在 → 只有带 `createTargetDir:true` 才建（递归建父目录），否则当场拒绝，免得打错字建出一堆空目录。
+- 路径在**排队前**校验：相对路径、不存在、不是一个目录，一律当场拒绝。顺序很重要——先校验再摘要，坏路径不会先花掉一次摘要调用、再把摘要挂在那儿没人取。
+- 只对这一次交接有效：交接时消耗掉，`cancel` 也清掉，不会延续到下一次。
+- `dryRun` 下只报告「会在哪开」，不建目录、不摘要。
+
+模型侧的用法：先 `session_handoff(action:"workspaces")` 看清单，再 `session_handoff(action:"handoff", targetDir:"E:\dsh\new-project")`；用户确认是新建的目录，才加 `createTargetDir:true`。
 
 ## 摘要与路线卡
 
@@ -116,7 +129,7 @@
 
 npm 上的名字是 `@better-than-coca/dsh-session-handoff`。装进桌面端 profile 分两步：
 
-1. `profiles/desktop/package.json` 的 `dependencies` 加 `"@better-than-coca/dsh-session-handoff": "^0.6.0"`，`dsh.profile.bundles` 数组末尾加同名条目。
+1. `profiles/desktop/package.json` 的 `dependencies` 加 `"@better-than-coca/dsh-session-handoff": "^0.7.0"`，`dsh.profile.bundles` 数组末尾加同名条目。
 2. 在 profile 目录跑 `pnpm install`，重启桌面端。
 
 **别用 `link:` 指向本地源码目录。** pnpm 会把这种依赖建成 junction，Node 按真实路径解析，从源码目录里找不到 profile 里的 `@deepseek-ai/*` 宿主包 —— 表现是插件显示「已启用」，但助手消息下没有按钮、左侧栏也没有设置页。安装目录必须是真实副本，不能是符号链接。
@@ -125,7 +138,7 @@ npm 上的名字是 `@better-than-coca/dsh-session-handoff`。装进桌面端 pr
 
 启用：`profiles/desktop/cordis.patch.yml` 里 `id: session-handoff` 的 `disabled` 改 `false`。
 
-测试（5 个套件、220 条断言；自动建沙箱与宿主包 stub）：
+测试（5 个套件、236 条断言；自动建沙箱与宿主包 stub）：
 
 ```powershell
 cd E:\dsh\dsh-session-handoff
@@ -160,6 +173,7 @@ workflow 先校验 tag 名等于 `package.json` 的版本，再跑 `npm test`，
 
 ## 版本
 
+- `0.7.0`（2026-10-28）：交接可以落到另一个工作区。`session_handoff` 新增 `targetDir` / `createTargetDir` 两个参数和 `action:"workspaces"`：目标目录可以是已登记的工作区，也可以是还不存在的目录（插件递归建好并自动登记成新工作区）；选择只对这一次交接有效，用完即弃。路径在排队前校验，坏路径不会先花一次摘要调用。面板与设置页二进制不变。
 - `0.6.0`（2026-10-28）：设置页重做，版式与记忆系统统一。顶栏、四格指标条、分区卡、分段控件、滑杆、开关、步进器全部换成记忆系统那套几何与间距；颜色/圆角/字号改用宿主的 `--dsw-alias-*`、`--dsw-radius-*` 变量，不再自带调色板，宿主换主题会自动跟随。压力低于 `minRatio` 时顶部出一条黄色原因条。设置页顶部的版本号改成从 `package.json` 读（之前硬编码成 0.5.3，装的是 0.5.7 也照样显示 0.5.3）。
 - `0.5.7`（2026-10-28）：状态接口与真正的交接判定对齐。`performHandoff` 一直在压力低于 `minRatio`（默认 0.30）时拒绝，但 `/status`、`session_handoff(action:"status")` 不检查它，于是压力不到线时仍报「可交接」，点按钮/调工具也回 `queued`，等到这一轮结束才被静默拒绝——文件不写、日志里只有一行 warn，看起来就是「什么都没发生」。现在 `refusalReasons` 收下压力读数一起判断：`/status` 的 `eligible`/`reason` 会直接写「pressure 26.0% is below minRatio 0.3」，工具也返回 `REFUSED` 而不是 `QUEUED`。排队机制本身没改。
 - `0.5.6`（2026-10-28）：加 GitHub Actions 发布流水线（OIDC trusted publishing；推 `v*` tag 自动 `npm test` + `npm publish`，不再需要 2FA 或 npm token），补 `.gitattributes`。插件代码与安装方式不变。

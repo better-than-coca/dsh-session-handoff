@@ -65,7 +65,7 @@ function copy(from, to) {
 
 ensureStubs();
 copy(join(root, 'lib', 'index.js'), join(sandbox, 'lib', 'index.js'));
-for (const file of ['handoff.js', 'config.js', 'pressure.js', 'history.js', 'route-card.js', 'summary-engine.js', 'debug.js', 'archive.js', 'checkpoint.js', 'http.js', 'settings.js']) {
+for (const file of ['handoff.js', 'config.js', 'pressure.js', 'history.js', 'route-card.js', 'summary-engine.js', 'debug.js', 'archive.js', 'checkpoint.js', 'http.js', 'settings.js', 'target.js']) {
     copy(join(root, 'lib', file), join(sandbox, 'lib', file));
 }
 copy(join(root, 'test', 'features.mjs'), join(sandbox, 'test', 'features.mjs'));
