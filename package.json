@@ -1,6 +1,6 @@
 {
   "name": "@better-than-coca/dsh-session-handoff",
-  "version": "0.5.7",
+  "version": "0.6.0",
   "description": "Threshold-triggered session handoff for DSH: summarize the current session and open a brand-new one, leaving the old log intact as a searchable archive.",
   "type": "module",
   "main": "lib/index.js",
