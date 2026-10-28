@@ -3,7 +3,7 @@
  *
  * The plugin imports three host packages by bare specifier, so the suites cannot
  * run inside the source tree: node would fail to resolve them. This script
- * builds a sandbox one directory up with minimal stubs for those three
+ * builds a sandbox under dev/ with minimal stubs for those three
  * packages, copies lib/ and the two suites in, and runs them there.
  *
  *   node test/run.mjs
@@ -16,7 +16,7 @@ import { spawnSync } from 'node:child_process';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
-const sandbox = resolve(root, '..', '.tmp-handoff-it');
+const sandbox = resolve(root, 'dev', '.tmp-handoff-it');
 
 const STUBS = {
     'dsh-llm': {
