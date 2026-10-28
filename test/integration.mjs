@@ -312,6 +312,12 @@ function settingsReq(method, payload) {
     check('settings wire: routes registered', routes.length === 4, String(routes.length));
     check('settings wire: archive tool starts on', tools.some((tool) => tool.name === 'handoff_history'));
 
+    const get = settingsReq('GET');
+    await get.applied;
+    const read = JSON.parse(get.response.text);
+    check('settings wire: the panel payload carries a version field',
+        typeof read.version === 'string', JSON.stringify(read.version));
+
     const off = settingsReq('POST', { values: { includeHistoryTool: false } });
     await off.applied;
     check('settings wire: toggling off unregisters the archive tool',

@@ -264,65 +264,99 @@ window.__ModuleLoader__.load({
     const COPY = {
       zh: {
         title: '会话交接',
-        blurb: '上下文到阈值时把这一会话摘要出来，交给一个新会话接着做。旧会话永远不会被压缩或改动。',
-        live: '本会话上下文',
-        close: '关闭',
-        secTrigger: '触发',
-        secTriggerNote: '什么时候提醒你，要不要自动做',
-        secBehaviour: '行为',
-        secBehaviourNote: '交接本身怎么执行',
-        save: '已保存',
-        reset: '恢复默认',
-        ready: '可交接',
-        waiting: '没有等待中的摘要',
-        last: '最近一次',
         label: '会话交接',
+        back: '返回会话',
+        close: '关闭',
+        check: '检查状态',
+        connected: '已连接',
+        scope: '存储范围',
+        scopeGlobal: '全局',
+        pageTitle: '系统状态',
+        pageDesc: '交接触发器、上下文压力与落盘位置的运行状态。',
+        metricPressure: '上下文压力',
+        metricThreshold: '触发门槛',
+        metricThresholdNote: '提醒 / 自动',
+        metricLast: '上次交接',
+        metricLastNone: '未交接',
+        metricLastNote: '本会话还没有落过摘要',
+        metricPending: '待取走',
+        metricPendingNone: '无',
+        metricPendingWaiting: '有摘要等新会话取走',
+        metricPendingNote: '新会话第一条消息会收到',
+        statusReady: '可交接',
+        statusBlocked: '低于门槛',
+        statusOff: '已关闭',
+        statusRunning: '正在生成摘要',
+        statusUnknown: '未知',
+        secTrigger: '触发',
+        secTriggerNote: '什么压力下提醒你、什么压力下自己动手。',
+        secBehaviour: '行为',
+        secBehaviourNote: '交接怎么执行、留给下一个会话什么。',
+        save: '已保存',
+        reset: '重置为默认',
         hint: {
-          mode: '询问＝到阈值时提醒你；自动＝达到自动阈值直接交接；关闭＝只保留消息行里的手动按钮',
-          askRatio: '上下文占用超过这个比例就提醒你一次',
-          autoRatio: '必须高于询问阈值，否则自动交接会抢在提醒之前发生',
+          mode: '关＝只保留消息行里的手动按钮；询问＝到线时问你一次；自动＝到线后自己交接',
+          askRatio: '上下文占用超过这个比例，就在回复前提醒你一次',
+          autoRatio: '必须高于提醒门槛，否则自动交接会抢在提醒之前发生',
           noticeCooldownMs: '同一会话里两次提醒之间至少隔这么久，避免反复打断',
-          dryRun: '只报告会做什么，不真的调用摘要模型',
+          dryRun: '只报告将要做什么，不真的调用摘要模型、不建会话',
           maxHandoffsPerSession: '防止一个会话被反反复复地交接出去',
-          includeHistoryTool: '给模型 handoff_history，可以只读搜索旧会话日志',
-          autoOpenSession: '交接完成后自动开一个新会话、注入摘要并切过去'
+          includeHistoryTool: '给模型 handoff_history，可以只读搜索旧会话原文',
+          autoOpenSession: '交接完成后直接开一个新会话，第一条消息由插件发出'
         },
         name: {
-          mode: '模式', askRatio: '询问阈值', autoRatio: '自动阈值', noticeCooldownMs: '提醒冷却',
-          dryRun: '试运行', maxHandoffsPerSession: '每个会话最多交接次数', includeHistoryTool: '提供原文检索工具',
+          mode: '模式', askRatio: '提醒门槛', autoRatio: '自动门槛', noticeCooldownMs: '提醒冷却',
+          dryRun: '试运行', maxHandoffsPerSession: '每会话上限', includeHistoryTool: '历史检索工具',
           autoOpenSession: '自动开新会话'
         },
-        modes: { ask: '询问', auto: '自动', off: '关闭' },
-        minute: '分'
+        modes: { ask: '询问', auto: '自动', off: '关' },
+        minute: '分钟'
       },
       en: {
         title: 'Session handoff',
-        blurb: 'Summarize this session at a threshold and continue in a new one. The old session is never compacted or modified.',
-        live: 'This session',
+        label: 'Session handoff',
+        back: 'Back to chat',
         close: 'Close',
+        check: 'Check status',
+        connected: 'Connected',
+        scope: 'Scope',
+        scopeGlobal: 'Global',
+        pageTitle: 'System status',
+        pageDesc: 'How the trigger, the context pressure and the checkpoint on disk are doing.',
+        metricPressure: 'Context pressure',
+        metricThreshold: 'Trigger lines',
+        metricThresholdNote: 'ask / auto',
+        metricLast: 'Last handoff',
+        metricLastNone: 'None yet',
+        metricLastNote: 'this session has no checkpoint yet',
+        metricPending: 'Waiting checkpoint',
+        metricPendingNone: 'None',
+        metricPendingWaiting: 'one is waiting for a new chat',
+        metricPendingNote: 'the next new chat receives it',
+        statusReady: 'Eligible',
+        statusBlocked: 'Below the floor',
+        statusOff: 'Off',
+        statusRunning: 'Summarizing',
+        statusUnknown: 'Unknown',
         secTrigger: 'Trigger',
-        secTriggerNote: 'when to ask, and whether to act alone',
+        secTriggerNote: 'when to ask you, and when to act alone.',
         secBehaviour: 'Behaviour',
-        secBehaviourNote: 'how the handoff itself runs',
+        secBehaviourNote: 'how the handoff runs and what it leaves behind.',
         save: 'Saved',
         reset: 'Reset to defaults',
-        ready: 'Eligible',
-        waiting: 'No waiting checkpoint',
-        last: 'Last one',
-        label: 'Session handoff',
         hint: {
-          mode: 'ask = check in at the threshold; auto = hand off at the auto threshold; off = keep only the manual button',
+          mode: 'off = keep only the manual button; ask = check in at the line; auto = hand off on its own',
           askRatio: 'How full the context must get before you are asked',
-          autoRatio: 'Must stay above the ask threshold, or auto mode would act before asking',
+          autoRatio: 'Must stay above the ask line, or auto mode would act before asking',
           noticeCooldownMs: 'Minimum gap between two notices in one session',
-          dryRun: 'Report what would happen without calling the summarizer',
+          dryRun: 'Report what would happen without calling the summarizer or opening a session',
           maxHandoffsPerSession: 'Stops one session being handed off over and over',
           includeHistoryTool: 'Give the model handoff_history to search the old log read-only',
-          autoOpenSession: 'After the summary, open a new session, inject it there and switch over'
+          autoOpenSession: 'After the checkpoint, open a new session and send its first message'
         },
         name: {
-          mode: 'Mode', askRatio: 'Ask threshold', autoRatio: 'Auto threshold', noticeCooldownMs: 'Notice cooldown',
-          dryRun: 'Dry run', maxHandoffsPerSession: 'Max handoffs per session', includeHistoryTool: 'Archive search tool',
+          mode: 'Mode', askRatio: 'Ask line', autoRatio: 'Auto line', noticeCooldownMs: 'Notice cooldown',
+          dryRun: 'Dry run', maxHandoffsPerSession: 'Max per session', includeHistoryTool: 'Archive search tool',
           autoOpenSession: 'Open the new session'
         },
         modes: { ask: 'Ask', auto: 'Auto', off: 'Off' },
@@ -331,66 +365,83 @@ window.__ModuleLoader__.load({
     }
 
     const PANEL_CSS = [
-      '.dsh-ho-panel{height:100%;display:flex;flex-direction:column;background:#fff;color:#1c1c1a;font-size:13px;line-height:1.5;--ho-ink:#1c1c1a;--ho-ink2:#57574f;--ho-ink3:#8b8b82;--ho-ink4:#a8a89f;--ho-line:#e6e5df;--ho-line-soft:#efeee9;--ho-sunken:#faf9f6;--ho-hover:#f4f3ee;--ho-accent:#6b7f72;--ho-accent-soft:#eef2ef;--ho-ok:#4f8a6d}',
-      '.dsh-ho-scroll{flex:1;min-height:0;overflow:auto}',
-      '.dsh-ho-head{padding:16px 26px 13px;border-bottom:1px solid var(--ho-line-soft)}',
-      '.dsh-ho-title{display:flex;align-items:center;gap:9px}',
-      '.dsh-ho-title h1{font-size:15px;font-weight:600;letter-spacing:-.01em;margin:0}',
-      '.dsh-ho-badge{font-size:10.5px;font-weight:500;letter-spacing:.03em;color:var(--ho-accent);background:var(--ho-accent-soft);border-radius:4px;padding:2px 6px}',
-      '.dsh-ho-x{margin-left:auto;width:26px;height:26px;border:0;background:none;border-radius:6px;color:var(--ho-ink3);cursor:pointer;display:flex;align-items:center;justify-content:center}',
-      '.dsh-ho-x:hover{background:var(--ho-hover);color:var(--ho-ink)}',
-      '.dsh-ho-blurb{margin:4px 0 0;font-size:12px;color:var(--ho-ink3);max-width:56ch}',
-      '.dsh-ho-live{padding:13px 26px 15px;background:var(--ho-sunken);border-bottom:1px solid var(--ho-line-soft)}',
-      '.dsh-ho-liverow{display:flex;align-items:baseline;gap:10px;margin-bottom:9px}',
-      '.dsh-ho-livelab{font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--ho-ink3)}',
-      '.dsh-ho-liveval{margin-left:auto;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}',
-      '.dsh-ho-liveval small{font-weight:400;color:var(--ho-ink4);font-family:inherit}',
-      '.dsh-ho-meter{position:relative;height:8px;border-radius:4px;background:#e9e8e2}',
-      '.dsh-ho-fill{position:absolute;inset:0 auto 0 0;border-radius:4px;background:linear-gradient(90deg,#82968a,#6b7f72)}',
-      '.dsh-ho-tick{position:absolute;top:-3px;bottom:-3px;width:1.5px;background:var(--ho-ink4);border-radius:1px}',
-      '.dsh-ho-tickcap{position:absolute;top:13px;font-size:10.5px;color:var(--ho-ink3);transform:translateX(-50%);white-space:nowrap}',
-      '.dsh-ho-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:26px}',
-      '.dsh-ho-chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ho-ink2);background:#fff;border:1px solid var(--ho-line);border-radius:99px;padding:3px 9px}',
-      '.dsh-ho-chip b{font-weight:500;font-variant-numeric:tabular-nums;color:var(--ho-ink)}',
-      '.dsh-ho-dot{width:6px;height:6px;border-radius:99px;background:var(--ho-ink4)}',
-      '.dsh-ho-dot.on{background:var(--ho-ok)}',
-      '.dsh-ho-body{padding:4px 26px 16px}',
-      '.dsh-ho-sec{padding:15px 0}',
-      '.dsh-ho-sec + .dsh-ho-sec{border-top:1px solid var(--ho-line-soft)}',
-      '.dsh-ho-sechead{display:flex;align-items:baseline;gap:8px;margin-bottom:2px}',
-      '.dsh-ho-sechead h2{font-size:11px;font-weight:600;letter-spacing:.07em;color:var(--ho-ink3);margin:0;text-transform:uppercase}',
-      '.dsh-ho-sechead span{font-size:11px;color:var(--ho-ink4)}',
-      '.dsh-ho-field{padding:9px 0}',
-      '.dsh-ho-fieldtop{display:flex;align-items:baseline;gap:12px}',
-      '.dsh-ho-name{font-size:13px;font-weight:500;flex:1;min-width:0}',
-      '.dsh-ho-hint{font-size:11.5px;color:var(--ho-ink3);margin-top:1px}',
-      '.dsh-ho-out{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;font-variant-numeric:tabular-nums;background:var(--ho-sunken);border:1px solid var(--ho-line);border-radius:5px;padding:1px 7px;min-width:50px;text-align:center}',
-      '.dsh-ho-inline{display:flex;align-items:center;gap:12px}',
-      '.dsh-ho-inline .dsh-ho-txt{flex:1;min-width:0}',
-      '.dsh-ho-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:var(--ho-sunken);border:1px solid var(--ho-line);border-radius:8px;padding:3px;margin-top:8px}',
-      '.dsh-ho-seg button{border:0;background:none;font-family:inherit;font-size:12.5px;color:var(--ho-ink2);padding:6px 0;border-radius:6px;cursor:pointer}',
-      '.dsh-ho-seg button:hover{color:var(--ho-ink)}',
-      '.dsh-ho-seg button[aria-pressed=true]{background:#fff;color:var(--ho-ink);font-weight:500;box-shadow:0 1px 2px rgba(28,28,26,.1),0 0 0 1px rgba(28,28,26,.05)}',
-      '.dsh-ho-range{appearance:none;-webkit-appearance:none;width:100%;height:18px;background:transparent;margin:7px 0 0;display:block;cursor:pointer}',
-      '.dsh-ho-range::-webkit-slider-runnable-track{height:5px;border-radius:3px;background:linear-gradient(90deg,#8c9a92 0%,#8c9a92 var(--p,50%),#e9e8e2 var(--p,50%),#e9e8e2 100%)}',
-      '.dsh-ho-range::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:99px;background:#fff;border:1.5px solid #6b7f72;box-shadow:0 1px 3px rgba(28,28,26,.22);margin-top:-4.5px}',
-      '.dsh-ho-range::-moz-range-track{height:5px;border-radius:3px;background:#e9e8e2}',
-      '.dsh-ho-range::-moz-range-thumb{width:13px;height:13px;border-radius:99px;background:#fff;border:1.5px solid #6b7f72}',
-      '.dsh-ho-tg{width:34px;height:19px;border-radius:99px;background:#dcdbd4;border:0;padding:0;cursor:pointer;position:relative;flex:0 0 auto;transition:background .14s}',
-      '.dsh-ho-tg i{position:absolute;top:2.5px;left:2.5px;width:14px;height:14px;border-radius:99px;background:#fff;box-shadow:0 1px 2px rgba(28,28,26,.25);transition:left .14s}',
-      '.dsh-ho-tg[aria-checked=true]{background:#7d9186}',
-      '.dsh-ho-tg[aria-checked=true] i{left:17.5px}',
-      '.dsh-ho-steps{display:inline-flex;align-items:center;border:1px solid var(--ho-line);border-radius:6px;background:#fff;overflow:hidden}',
-      '.dsh-ho-steps button{width:27px;height:26px;border:0;background:none;color:var(--ho-ink2);cursor:pointer;font-size:14px;line-height:1;font-family:inherit}',
-      '.dsh-ho-steps button:hover:not(:disabled){background:var(--ho-hover)}',
-      '.dsh-ho-steps button:disabled{color:var(--ho-ink4);cursor:not-allowed}',
-      '.dsh-ho-steps b{min-width:30px;text-align:center;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;font-weight:400;border-left:1px solid var(--ho-line-soft);border-right:1px solid var(--ho-line-soft);line-height:26px}',
-      '.dsh-ho-foot{display:flex;align-items:center;gap:12px;padding:10px 26px;border-top:1px solid var(--ho-line-soft);background:var(--ho-sunken)}',
-      '.dsh-ho-saved{font-size:11.5px;color:var(--ho-ok);opacity:0;transition:opacity .15s}',
-      '.dsh-ho-saved.show{opacity:1}',
-      '.dsh-ho-path{flex:1;font-family:ui-monospace,Consolas,monospace;font-size:11px;color:var(--ho-ink4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
-      '.dsh-ho-btn{font-family:inherit;font-size:11.5px;color:var(--ho-ink2);background:#fff;border:1px solid var(--ho-line);border-radius:6px;padding:5px 11px;cursor:pointer}',
-      '.dsh-ho-btn:hover{background:var(--ho-hover);color:var(--ho-ink)}'
+      /* The same layout grammar the Memory System page uses: a masthead, a page
+         header, a hairline metric strip and bordered section cards. Every colour
+         is a host alias token (with a literal fallback), so the panel follows the
+         host theme instead of carrying its own palette. */
+      '.dsh-ho-shell,.dsh-ho-shell *,.dsh-ho-shell *::before,.dsh-ho-shell *::after{box-sizing:border-box}',
+      '.dsh-ho-shell{height:100%;display:flex;flex-direction:column;min-height:0;overflow:hidden;background:var(--dsw-alias-bg-base,#fff);color:var(--dsw-alias-label-primary,#0f1115);font-size:13px;line-height:20px}',
+      '.dsh-ho-shell :where(button,input,select,textarea){color:inherit;font:inherit}',
+      '.dsh-ho-masthead{flex:none;display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 24px 4px}',
+      '.dsh-ho-back{flex:none;display:inline-flex;align-items:center;gap:4px;min-width:max-content;height:28px;padding:0 8px 0 4px;border:0;border-radius:var(--dsw-radius-sm,8px);background:none;color:var(--dsw-alias-label-tertiary,#979da6);font:inherit;cursor:pointer}',
+      '.dsh-ho-back:hover{color:var(--dsw-alias-label-secondary,#61666b);background:var(--dsw-alias-interactive-bg-hover,#2631480f)}',
+      '.dsh-ho-brand{flex:auto;display:flex;align-items:center;gap:4px 10px;flex-wrap:wrap;min-width:0}',
+      '.dsh-ho-brand h1{flex:none;margin:0;font-size:16px;line-height:24px;font-weight:500}',
+      '.dsh-ho-chip{display:inline-flex;align-items:center;gap:4px;flex:none;padding:1px 8px;border-radius:999px;white-space:nowrap;font-size:11px;line-height:17px;color:var(--dsw-alias-label-tertiary,#979da6);background:var(--dsw-alias-bg-module-platform,#f9fafb)}',
+      '.dsh-ho-chip strong{font-weight:500;color:var(--dsw-alias-label-secondary,#61666b)}',
+      '.dsh-ho-status{flex:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-size:13px;line-height:20px;color:var(--dsw-alias-label-tertiary,#979da6)}',
+      '.dsh-ho-dot{width:6px;height:6px;border-radius:50%;flex:none;background:var(--dsw-alias-state-idle-primary,#d4d4d4)}',
+      '.dsh-ho-dot.good{background:var(--dsw-alias-state-success-primary,#22c55e)}',
+      '.dsh-ho-dot.warn{background:var(--dsw-alias-state-warn-primary,#f59e0b)}',
+      '.dsh-ho-dot.bad{background:var(--dsw-alias-state-error-primary,#ef4444)}',
+      '.dsh-ho-actions{flex:none;display:flex;align-items:center;gap:8px;justify-content:flex-end}',
+      '.dsh-ho-iconbtn{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:var(--dsw-radius-sm,8px);background:none;color:var(--dsw-alias-label-caption,#adb2b8);cursor:pointer}',
+      '.dsh-ho-iconbtn:hover{color:var(--dsw-alias-label-secondary,#61666b);background:var(--dsw-alias-interactive-bg-hover,#2631480f)}',
+      '.dsh-ho-banner{flex:none;margin:8px 24px 0;padding:8px 12px;border-radius:var(--dsw-radius-md,12px);font-size:12px;line-height:18px;color:var(--dsw-alias-state-warn-label,#8a5a00);background:var(--dsw-alias-state-warn-tertiary,#fef5e7)}',
+      '.dsh-ho-canvas{flex:1;min-width:0;overflow:auto}',
+      '.dsh-ho-page{width:100%;padding:20px 24px 40px}',
+      '.dsh-ho-pagehead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px 24px;margin-bottom:16px}',
+      '.dsh-ho-pagehead h2{margin:0;font-size:16px;line-height:24px;font-weight:500}',
+      '.dsh-ho-pagehead p{margin:2px 0 0;max-width:72ch;font-size:13px;line-height:20px;color:var(--dsw-alias-label-secondary,#61666b)}',
+      '.dsh-ho-pagemeta{flex:none;display:flex;align-items:center;justify-content:flex-end;gap:8px}',
+      '.dsh-ho-pagemeta code{padding:1px 8px;border:.5px solid var(--dsw-alias-border-l4,#00000029);border-radius:999px;white-space:nowrap;font:500 11px/17px var(--ds-font-family-code,ui-monospace,Consolas,monospace);font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-tertiary,#979da6)}',
+      '.dsh-ho-secondary{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:32px;padding:0 12px;border:.5px solid var(--dsw-alias-border-l3,#0000001f);border-radius:var(--dsw-radius-md,12px);background:none;color:var(--dsw-alias-label-primary,#0f1115);font:inherit;cursor:pointer}',
+      '.dsh-ho-secondary:hover{background:var(--dsw-alias-interactive-bg-hover,#2631480f)}',
+      '.dsh-ho-strip{display:flex;flex-wrap:wrap;position:relative;overflow:hidden;margin-bottom:16px;border:.5px solid var(--dsw-alias-border-l4,#00000029);border-radius:var(--dsw-radius-lg,16px)}',
+      '.dsh-ho-strip article{flex:150px;min-width:0;min-height:76px;display:flex;align-items:flex-start;gap:10px;padding:14px 16px;margin:-.5px 0 0 -.5px;border-top:.5px solid var(--dsw-alias-border-l2,#0000001a);border-left:.5px solid var(--dsw-alias-border-l2,#0000001a)}',
+      '.dsh-ho-strip article>div{min-width:0}',
+      '.dsh-ho-strip .dsh-ho-dot{margin-top:6px}',
+      '.dsh-ho-strip small{display:block;margin-bottom:2px;font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary,#979da6)}',
+      '.dsh-ho-strip strong{display:block;font-size:14px;line-height:22px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.dsh-ho-strip p{margin:2px 0 0;font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary,#979da6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.dsh-ho-card{margin-bottom:16px;padding:16px;border:.5px solid var(--dsw-alias-border-l4,#00000029);border-radius:var(--dsw-radius-lg,16px)}',
+      '.dsh-ho-shead{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:36px;margin-bottom:8px}',
+      '.dsh-ho-shead h3{margin:0;font-size:14px;line-height:22px;font-weight:500}',
+      '.dsh-ho-shead span{display:block;margin-top:2px;font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary,#979da6)}',
+      '.dsh-ho-shead em{flex:none;padding:1px 8px;border-radius:999px;font-size:11px;line-height:17px;font-style:normal;font-weight:500;color:var(--dsw-alias-label-secondary,#61666b);background:var(--dsw-alias-bg-module-platform,#f9fafb)}',
+      '.dsh-ho-row{display:grid;grid-template-columns:minmax(0,1fr) 220px;align-items:center;gap:16px;padding:12px 0;border-top:.5px solid var(--dsw-alias-border-l2,#0000001a)}',
+      '.dsh-ho-rows>.dsh-ho-row:first-child{border-top:0;padding-top:4px}',
+      '.dsh-ho-rowtxt b{display:block;font-size:13px;line-height:20px;font-weight:500}',
+      '.dsh-ho-rowtxt span{display:block;margin-top:2px;font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary,#979da6)}',
+      '.dsh-ho-ctrl{display:flex;justify-content:flex-end;min-width:0}',
+      '.dsh-ho-seg{display:grid;grid-auto-flow:column;gap:2px;width:100%;padding:2px;border-radius:var(--dsw-radius-md,12px);background:var(--dsw-alias-bg-module-platform,#f9fafb)}',
+      '.dsh-ho-seg button{height:26px;border:0;border-radius:var(--dsw-radius-sm,8px);background:none;color:var(--dsw-alias-label-tertiary,#979da6);font:inherit;cursor:pointer}',
+      '.dsh-ho-seg button:hover{color:var(--dsw-alias-label-secondary,#61666b)}',
+      '.dsh-ho-seg button[aria-pressed=true]{background:var(--dsw-alias-bg-layer-1,#fff);color:var(--dsw-alias-label-primary,#0f1115);box-shadow:0 0 0 .5px var(--dsw-alias-border-l3,#0000001f)}',
+      '.dsh-ho-slider{width:100%}',
+      '.dsh-ho-readout{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}',
+      '.dsh-ho-readout b{font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}',
+      '.dsh-ho-readout em{font-size:11px;font-style:normal;color:var(--dsw-alias-label-tertiary,#979da6)}',
+      '.dsh-ho-range{appearance:none;-webkit-appearance:none;display:block;width:100%;height:16px;margin:0;background:transparent;cursor:pointer}',
+      '.dsh-ho-range::-webkit-slider-runnable-track{height:4px;border-radius:999px;background:linear-gradient(90deg,var(--dsw-alias-state-business-primary,#4176e6) 0%,var(--dsw-alias-state-business-primary,#4176e6) var(--p,50%),var(--dsw-alias-border-l2,#0000001a) var(--p,50%),var(--dsw-alias-border-l2,#0000001a) 100%)}',
+      '.dsh-ho-range::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;margin-top:-4px;border-radius:999px;background:var(--dsw-alias-bg-layer-1,#fff);box-shadow:0 0 0 1px var(--dsw-alias-border-l4,#00000029),0 1px 2px rgba(0,0,0,.16)}',
+      '.dsh-ho-range::-moz-range-track{height:4px;border-radius:999px;background:var(--dsw-alias-border-l2,#0000001a)}',
+      '.dsh-ho-range::-moz-range-progress{height:4px;border-radius:999px;background:var(--dsw-alias-state-business-primary,#4176e6)}',
+      '.dsh-ho-range::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:999px;background:var(--dsw-alias-bg-layer-1,#fff);box-shadow:0 0 0 1px var(--dsw-alias-border-l4,#00000029)}',
+      '.dsh-ho-tg{position:relative;width:34px;height:20px;padding:0;border:0;border-radius:999px;background:var(--dsw-alias-border-l4,#00000029);cursor:pointer;transition:background .14s}',
+      '.dsh-ho-tg i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:999px;background:var(--dsw-alias-switch-thumb,#fff);box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .14s}',
+      '.dsh-ho-tg[aria-checked=true]{background:var(--dsw-alias-state-business-primary,#4176e6)}',
+      '.dsh-ho-tg[aria-checked=true] i{left:16px}',
+      '.dsh-ho-steps{display:inline-flex;align-items:center;gap:2px;padding:2px;border-radius:var(--dsw-radius-md,12px);background:var(--dsw-alias-bg-module-platform,#f9fafb)}',
+      '.dsh-ho-steps button{width:26px;height:26px;padding:0;border:0;border-radius:var(--dsw-radius-sm,8px);background:none;color:var(--dsw-alias-label-secondary,#61666b);font:inherit;line-height:1;cursor:pointer}',
+      '.dsh-ho-steps button:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover,#2631480f)}',
+      '.dsh-ho-steps button:disabled{color:var(--dsw-alias-label-caption,#adb2b8);cursor:not-allowed}',
+      '.dsh-ho-steps b{min-width:28px;text-align:center;font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}',
+      '.dsh-ho-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:4px;padding:10px 12px;border-radius:var(--dsw-radius-md,12px);background:var(--dsw-alias-bg-module-platform,#f9fafb)}',
+      '.dsh-ho-path{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 12px/18px var(--ds-font-family-code,ui-monospace,Consolas,monospace);color:var(--dsw-alias-label-tertiary,#979da6)}',
+      '.dsh-ho-footacts{flex:none;display:flex;align-items:center;gap:12px}',
+      '.dsh-ho-saved{font-size:12px;color:var(--dsw-alias-state-success-primary,#22c55e);opacity:0;transition:opacity .15s}',
+      '.dsh-ho-saved.show{opacity:1}'
     ].join('\n')
 
     const injectCss = () => {
@@ -603,11 +654,13 @@ window.__ModuleLoader__.load({
       }
 
       if (data === null || draft === null) {
-        return h('div', { className: 'dsh-ho-panel' },
-          h('div', { className: 'dsh-ho-head' }, h('div', { className: 'dsh-ho-title' }, h('h1', null, c.title)))
+        return h('div', { className: 'dsh-ho-shell' },
+          h('header', { className: 'dsh-ho-masthead' },
+            h('div', { className: 'dsh-ho-brand' }, h('h1', null, c.title))
+          ),
+          h('div', { className: 'dsh-ho-canvas' })
         )
       }
-
       const controls = new Map(data.controls.map(control => [control.key, control]))
       const get = key => (draft[key] === undefined ? controls.get(key).fallback : draft[key])
 
@@ -619,68 +672,59 @@ window.__ModuleLoader__.load({
       const nameOf = key => (c.name[key] || key)
       const hintOf = key => (c.hint[key] || '')
 
-      const field = (control, body, inline) => h('div', { className: 'dsh-ho-field', key: control.key },
-        inline === true
-          ? h('div', { className: 'dsh-ho-inline' },
-            h('div', { className: 'dsh-ho-txt' },
-              h('div', { className: 'dsh-ho-name' }, nameOf(control.key)),
-              h('div', { className: 'dsh-ho-hint' }, hintOf(control.key))
-            ),
-            body
-          )
-          : h('div', null,
-            h('div', { className: 'dsh-ho-fieldtop' },
-              h('span', { className: 'dsh-ho-name' }, nameOf(control.key)),
-              h('span', { className: 'dsh-ho-out' }, body.label)
-            ),
-            h('div', { className: 'dsh-ho-hint' }, hintOf(control.key)),
-            body.input
-          )
+      const row = (control, body) => h('div', { className: 'dsh-ho-row', key: control.key },
+        h('div', { className: 'dsh-ho-rowtxt' },
+          h('b', null, nameOf(control.key)),
+          h('span', null, hintOf(control.key))
+        ),
+        h('div', { className: 'dsh-ho-ctrl' }, body)
       )
+
+      const domainOf = control => control.kind === 'duration'
+        ? Math.round(control.min / 60000) + ' – ' + Math.round(control.max / 60000) + ' ' + c.minute
+        : ratioText(control.min) + ' – ' + ratioText(control.max)
 
       const sliderField = control => {
         const value = get(control.key)
-        const input = h('input', {
-          key: 'r', type: 'range', className: 'dsh-ho-range',
-          min: control.min, max: control.max, step: control.step, value,
-          'aria-label': nameOf(control.key),
-          style: { '--p': barrier(value, control) },
-          onChange: event => setDraft(current => ({ ...current, [control.key]: Number(event.target.value) })),
-          onPointerUp: event => commit({ [control.key]: Number(event.target.value) }),
-          onKeyUp: event => commit({ [control.key]: Number(event.target.value) })
-        })
-        const label = control.kind === 'duration' ? durationText(value) : ratioText(value)
-        return field(control, { label, input })
+        return row(control, h('div', { className: 'dsh-ho-slider' },
+          h('div', { className: 'dsh-ho-readout' },
+            h('b', null, control.kind === 'duration' ? durationText(value) : ratioText(value)),
+            h('em', null, domainOf(control))
+          ),
+          h('input', {
+            type: 'range', className: 'dsh-ho-range',
+            min: control.min, max: control.max, step: control.step, value,
+            'aria-label': nameOf(control.key),
+            style: { '--p': barrier(value, control) },
+            onChange: event => setDraft(current => ({ ...current, [control.key]: Number(event.target.value) })),
+            onPointerUp: event => commit({ [control.key]: Number(event.target.value) }),
+            onKeyUp: event => commit({ [control.key]: Number(event.target.value) })
+          })
+        ))
       }
 
       const modeField = control => {
         const value = get(control.key)
-        const seg = h('div', { className: 'dsh-ho-seg', role: 'group', 'aria-label': nameOf(control.key) },
+        return row(control, h('div', { className: 'dsh-ho-seg', role: 'group', 'aria-label': nameOf(control.key) },
           control.options.map(option => h('button', {
-            key: option, type: 'button',
-            'aria-pressed': value === option,
+            key: option, type: 'button', 'aria-pressed': value === option,
             onClick: () => commit({ [control.key]: option })
           }, c.modes[option] || option))
-        )
-        return h('div', { className: 'dsh-ho-field', key: control.key },
-          h('div', { className: 'dsh-ho-name' }, nameOf(control.key)),
-          h('div', { className: 'dsh-ho-hint' }, hintOf(control.key)),
-          seg
-        )
+        ))
       }
 
       const toggleField = control => {
         const value = get(control.key) === true
-        return field(control, h('button', {
-          key: 't', type: 'button', className: 'dsh-ho-tg', role: 'switch',
+        return row(control, h('button', {
+          type: 'button', className: 'dsh-ho-tg', role: 'switch',
           'aria-checked': value, 'aria-label': nameOf(control.key),
           onClick: () => commit({ [control.key]: !value })
-        }, h('i', null)), true)
+        }, h('i', null)))
       }
 
       const countField = control => {
         const value = get(control.key)
-        return field(control, h('div', { className: 'dsh-ho-steps' },
+        return row(control, h('div', { className: 'dsh-ho-steps' },
           h('button', {
             key: 'm', type: 'button', disabled: value <= control.min,
             'aria-label': '−', onClick: () => commit({ [control.key]: Math.max(control.min, value - 1) })
@@ -690,7 +734,7 @@ window.__ModuleLoader__.load({
             key: 'p', type: 'button', disabled: value >= control.max,
             'aria-label': '＋', onClick: () => commit({ [control.key]: Math.min(control.max, value + 1) })
           }, '＋')
-        ), true)
+        ))
       }
 
       const renderControl = key => {
@@ -703,83 +747,98 @@ window.__ModuleLoader__.load({
       }
 
       const last = snapshot && snapshot.lastHandoff
+      const mode = get('mode')
+      const hasSnap = snapshot !== undefined && snapshot !== null
+      const ready = hasSnap && snapshot.eligible === true
+      const running = hasSnap && snapshot.running === true
+      const waiting = hasSnap && snapshot.pending === 'waiting'
+      const reason = hasSnap && typeof snapshot.reason === 'string' && snapshot.reason !== '' ? snapshot.reason : null
+      const dot = running ? ' warn' : ready ? ' good' : mode === 'off' ? '' : ' warn'
+      const state = running ? c.statusRunning
+        : mode === 'off' ? c.statusOff
+          : ready ? c.statusReady
+            : hasSnap ? c.statusBlocked : c.statusUnknown
+      const pressure = hasSnap && snapshot.pressure !== null && snapshot.pressure !== undefined ? snapshot.pressure : null
+      const pressureValue = pressure !== null
+        ? String(pressure.text || '').replace(/\s*\(.*$/, '')
+        : ratio === null ? '—' : ratioText(ratio)
+      const pressureNote = pressure === null
+        ? ''
+        : (String(pressure.text || '').match(/\(([^)]*)\)/) || [null, ''])[1]
 
-      return h('div', { className: 'dsh-ho-panel' },
-        h('div', { className: 'dsh-ho-scroll' },
-          h('div', { className: 'dsh-ho-head' },
-            h('div', { className: 'dsh-ho-title' },
-              h('h1', null, c.title),
-              h('span', { className: 'dsh-ho-badge' }, '0.5.3'),
-              h('button', { type: 'button', className: 'dsh-ho-x', 'aria-label': c.close, onClick: close },
-                svgPanel([h('path', { key: 'x', d: 'M6 6l12 12M18 6L6 18' })], { strokeWidth: 1.7 }))
-            ),
-            h('p', { className: 'dsh-ho-blurb' }, c.blurb)
+      /** One tile of the hairline metric strip. */
+      const metric = (label, value, note, tone) => h('article', { key: label },
+        h('span', { className: 'dsh-ho-dot' + (tone === '' ? '' : ' ' + tone) }),
+        h('div', null, h('small', null, label), h('strong', null, value), h('p', null, note))
+      )
+
+      /** One bordered section card holding a run of control rows. */
+      const section = (title, note, pill, keys) => h('section', { className: 'dsh-ho-card' },
+        h('div', { className: 'dsh-ho-shead' },
+          h('div', null, h('h3', null, title), h('span', null, note)),
+          pill === null ? null : h('em', null, pill)
+        ),
+        h('div', { className: 'dsh-ho-rows' }, keys.map(renderControl).filter(entry => entry !== null))
+      )
+
+      return h('div', { className: 'dsh-ho-shell' },
+        h('header', { className: 'dsh-ho-masthead' },
+          h('button', { type: 'button', className: 'dsh-ho-back', onClick: close },
+            svgPanel([h('path', { key: 'c', d: 'M15 5l-7 7 7 7' })], { width: 14, height: 14, strokeWidth: 1.8 }),
+            c.back
           ),
-
-          h('div', { className: 'dsh-ho-live' },
-            h('div', { className: 'dsh-ho-liverow' },
-              h('span', { className: 'dsh-ho-livelab' }, c.live),
-              h('span', { className: 'dsh-ho-liveval' },
-                ratio === null ? '—' : ratioText(ratio),
-                snapshot && snapshot.pressure && snapshot.pressure.text
-                  ? h('small', null, ' · ' + snapshot.pressure.text.replace(/^[\d.]+%\s*/, ''))
-                  : null
-              )
-            ),
-            h('div', { className: 'dsh-ho-meter' },
-              ratio === null ? null : h('div', { className: 'dsh-ho-fill', style: { width: ratioText(Math.min(1, ratio)) } }),
-              h('div', { className: 'dsh-ho-tick', style: { left: ratioText(ask) } }),
-              h('div', { className: 'dsh-ho-tickcap', style: { left: ratioText(ask) } }, c.name.askRatio + ' ' + ratioText(ask)),
-              h('div', { className: 'dsh-ho-tick', style: { left: ratioText(auto) } }),
-              h('div', { className: 'dsh-ho-tickcap', style: { left: ratioText(auto) } }, c.name.autoRatio + ' ' + ratioText(auto))
-            ),
-            h('div', { className: 'dsh-ho-chips' },
-              h('span', { className: 'dsh-ho-chip' },
-                h('span', { className: 'dsh-ho-dot' + (snapshot && snapshot.eligible ? ' on' : '') }),
-                snapshot && snapshot.eligible ? c.ready : (snapshot && snapshot.reason ? snapshot.reason : '—')
-              ),
-              h('span', { className: 'dsh-ho-chip' },
-                h('span', { className: 'dsh-ho-dot' + (snapshot && snapshot.pending === 'waiting' ? ' on' : '') }),
-                snapshot && snapshot.pending === 'waiting' ? '等待新会话取走' : c.waiting
-              ),
-              last === undefined || last === null
-                ? null
-                : h('span', { className: 'dsh-ho-chip' }, c.last + ' ',
-                  h('b', null, String(Math.round(last.ratio || 0)) + ' : 1'),
-                  last.summaryTokens ? ' · ' + last.summaryTokens + ' tokens' : '')
-            )
+          h('div', { className: 'dsh-ho-brand' },
+            h('h1', null, c.title),
+            h('span', { className: 'dsh-ho-chip' }, c.scope + ' ', h('strong', null, c.scopeGlobal))
           ),
-
-          h('div', { className: 'dsh-ho-body' },
-            h('div', { className: 'dsh-ho-sec' },
-              h('div', { className: 'dsh-ho-sechead' },
-                h('h2', null, c.secTrigger),
-                h('span', null, c.secTriggerNote)
-              ),
-              renderControl('mode'),
-              renderControl('askRatio'),
-              renderControl('autoRatio'),
-              renderControl('noticeCooldownMs')
+          h('div', { className: 'dsh-ho-status' },
+            h('span', { className: 'dsh-ho-dot' + dot }),
+            c.connected + ' · ' + (c.modes[mode] || mode)
+          ),
+          h('div', { className: 'dsh-ho-actions' },
+            h('button', { type: 'button', className: 'dsh-ho-iconbtn', title: c.check, onClick: () => { void refresh() } },
+              svgPanel([h('path', { key: 'a', d: 'M20 11a8 8 0 1 0-2.3 5.7' }), h('path', { key: 'b', d: 'M20 5v6h-6' })], { width: 16, height: 16 })
             ),
-            h('div', { className: 'dsh-ho-sec' },
-              h('div', { className: 'dsh-ho-sechead' },
-                h('h2', null, c.secBehaviour),
-                h('span', null, c.secBehaviourNote)
-              ),
-              renderControl('dryRun'),
-              renderControl('maxHandoffsPerSession'),
-              renderControl('includeHistoryTool'),
-              renderControl('autoOpenSession')
+            h('button', { type: 'button', className: 'dsh-ho-iconbtn', title: c.close, onClick: close },
+              svgPanel([h('path', { key: 'x', d: 'M6 6l12 12M18 6L6 18' })], { width: 16, height: 16, strokeWidth: 1.7 })
             )
           )
         ),
-        h('div', { className: 'dsh-ho-foot' },
-          h('span', { className: 'dsh-ho-saved' + (saved ? ' show' : '') }, '✓ ' + c.save),
-          h('span', { className: 'dsh-ho-path' }, data.path),
-          h('button', {
-            type: 'button', className: 'dsh-ho-btn',
-            onClick: () => { void post({ reset: true }) }
-          }, c.reset)
+        reason === null ? null : h('div', { className: 'dsh-ho-banner', role: 'status' }, reason),
+        h('div', { className: 'dsh-ho-canvas' },
+          h('div', { className: 'dsh-ho-page' },
+            h('div', { className: 'dsh-ho-pagehead' },
+              h('div', null, h('h2', null, c.pageTitle), h('p', null, c.pageDesc)),
+              h('div', { className: 'dsh-ho-pagemeta' },
+                typeof data.version === 'string' && data.version !== '' ? h('code', null, 'v' + data.version) : null,
+                h('span', { className: 'dsh-ho-chip' }, h('span', { className: 'dsh-ho-dot' + dot }), state),
+                h('button', { type: 'button', className: 'dsh-ho-secondary', onClick: () => { void refresh() } }, c.check)
+              )
+            ),
+            h('div', { className: 'dsh-ho-strip' },
+              metric(c.metricPressure, pressureValue, pressureNote, ready ? 'good' : 'warn'),
+              metric(c.metricThreshold, ratioText(ask) + ' / ' + ratioText(auto), c.metricThresholdNote, 'good'),
+              metric(c.metricLast,
+                last === undefined || last === null ? c.metricLastNone : Math.round(last.ratio || 0) + ' : 1',
+                last === undefined || last === null ? c.metricLastNote : String(last.summaryTokens || '') + ' tokens',
+                ''),
+              metric(c.metricPending,
+                waiting ? c.metricPendingWaiting : c.metricPendingNone,
+                c.metricPendingNote,
+                waiting ? 'warn' : '')
+            ),
+            section(c.secTrigger, c.secTriggerNote, c.modes[mode] || mode,
+              ['mode', 'askRatio', 'autoRatio', 'noticeCooldownMs']),
+            section(c.secBehaviour, c.secBehaviourNote, null,
+              ['dryRun', 'maxHandoffsPerSession', 'includeHistoryTool', 'autoOpenSession']),
+            h('div', { className: 'dsh-ho-foot' },
+              h('code', { className: 'dsh-ho-path' }, String(data.path || '')),
+              h('div', { className: 'dsh-ho-footacts' },
+                h('span', { className: 'dsh-ho-saved' + (saved ? ' show' : '') }, '✓ ' + c.save),
+                h('button', { type: 'button', className: 'dsh-ho-secondary', onClick: () => { void post({ reset: true }) } }, c.reset)
+              )
+            )
+          )
         )
       )
     }
