@@ -14,7 +14,12 @@ if (Test-Path $link) {
         Remove-Item $link -Recurse -Force
     }
 }
+# 目标目录必须先存在：Copy-Item -Recurse 到不存在的路径会把 lib 的内容
+# 直接摊成包根（没有 lib/），包随即起不来。0.7.0 第一次安装就这么中过。
+New-Item -ItemType Directory $link -Force | Out-Null
 Copy-Item $src $link -Recurse
+Copy-Item (Join-Path $PSScriptRoot 'LICENSE') $link
+Copy-Item (Join-Path $PSScriptRoot 'README.md') $link
 Copy-Item (Join-Path $PSScriptRoot 'client.js') $link
 Copy-Item (Join-Path $PSScriptRoot 'package.json') $link
 Copy-Item (Join-Path $PSScriptRoot 'cordis.patch.yml') $link
