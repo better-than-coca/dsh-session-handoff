@@ -75,7 +75,11 @@ copy(join(root, 'test', 'archive.mjs'), join(sandbox, 'test', 'archive.mjs'));
 copy(join(root, 'test', 'routes.mjs'), join(sandbox, 'test', 'routes.mjs'));
 copy(join(root, 'test', 'settings.mjs'), join(sandbox, 'test', 'settings.mjs'));
 
-const suites = [join('test', 'features.mjs'), join('test', 'archive.mjs'), 'integration.mjs', join('test', 'routes.mjs'), join('test', 'settings.mjs')];
+// The client suite loads the shipped bundle itself, so it has to sit beside it.
+copy(join(root, 'client.js'), join(sandbox, 'client.js'));
+copy(join(root, 'test', 'client.mjs'), join(sandbox, 'test', 'client.mjs'));
+
+const suites = [join('test', 'features.mjs'), join('test', 'archive.mjs'), 'integration.mjs', join('test', 'routes.mjs'), join('test', 'settings.mjs'), join('test', 'client.mjs')];
 let failed = 0;
 for (const suite of suites) {
     process.stdout.write('\n=== ' + suite + ' ===\n');

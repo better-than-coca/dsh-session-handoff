@@ -146,20 +146,27 @@ window.__ModuleLoader__.load({
 
     // ------------------------------------------------- follow-up session
     /**
-     * Navigation service the Host exposes to Client plugins. Captured only when
-     * it resolves: switching to the new Session is a convenience — the Session
-     * itself is created by the host half, not here.
+     * Host services are resolved on demand. Plugin packages run behind the
+     * dynamic ctx facade, where `ctx.serviceName` only answers for services
+     * declared in the plugin's `inject` list — reaching an undeclared one
+     * throws. `ctx.get(name)` is the optional lookup that works either way,
+     * and switching to the new Session stays a convenience: the Session itself
+     * is created by the host half, not here.
      */
-    let workspace = null
+    let serviceCtx = null
+
+    const serviceOf = name => {
+      if (serviceCtx === null) return null
+      try {
+        const service = serviceCtx.get(name)
+        return service === undefined ? null : service
+      } catch {
+        return null
+      }
+    }
 
     const captureServices = ctx => {
-      try {
-        ctx.inject(['uiWorkspace'], scoped => {
-          workspace = scoped.get('uiWorkspace') ?? scoped.uiWorkspace ?? null
-        })
-      } catch {
-        /* no session navigation service */
-      }
+      serviceCtx = ctx
     }
 
     /** How long the button watches for the host's follow-up Session. */
@@ -197,6 +204,7 @@ window.__ModuleLoader__.load({
 
     /** Switch to the Session the host opened, when navigation is available. */
     const revealSession = sessionId => {
+      const workspace = serviceOf('uiWorkspace')
       if (workspace === null || typeof workspace.openSession !== 'function') return
       try {
         workspace.openSession(sessionId)
@@ -861,10 +869,10 @@ window.__ModuleLoader__.load({
         // System (order 30) and Skills (order 31). A layout without native panel
         // seats simply never declares these two slots, so nothing is registered.
         const closePanel = () => {
+          const layout = serviceOf('layout')
+          if (layout === null || typeof layout.selectPanel !== 'function') return
           try {
-            if (ctx.layout !== undefined && typeof ctx.layout.selectPanel === 'function') {
-              ctx.layout.selectPanel(null)
-            }
+            layout.selectPanel(null)
           } catch {
             /* a host without the layout service keeps the panel open */
           }
